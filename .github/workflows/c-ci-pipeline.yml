@@ -1,0 +1,64 @@
+name: C Modulo CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Stage 1: Source - Checkout code
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+      
+    # Stage 2: Build - Setup environment and compile C code
+    - name: Install GCC Compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc make
+        gcc --version
+        echo "✅ GCC compiler installed successfully"
+        
+    - name: Build C Application
+      run: |
+        make build
+        echo "✅ Build stage completed - C code compiled successfully"
+        
+    # Stage 3: Test - Run unit tests
+    - name: Run Unit Tests
+      run: |
+        make test
+        echo "✅ All C unit tests passed"
+        
+    - name: Create Build Artifact
+      run: |
+        python3 build_artifact.py
+        echo "✅ Build artifact created"
+        
+    # Stage 4: Package - Upload artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: c-modulo-artifact
+        path: |
+          build/
+          modulo.c
+          test_modulo.c
+          Makefile
+        retention-days: 7
+        
+    # Stage 5: Simulated Deploy
+    - name: Simulated Deployment
+      run: |
+        echo "🚀 Starting simulated deployment..."
+        echo "📦 Downloaded C compiled binaries for deployment"
+        echo "🔑 Using API Key: ${{ secrets.DEPLOY_API_KEY }}"
+        echo "💻 Deploying C modulo application..."
+        echo "✅ Deployment completed successfully!"
+        echo "🎯 Same C binaries used for build and deploy - 'Build Once, Deploy Many'"
+      env:
+        DEPLOY_API_KEY: ${{ secrets.DEPLOY_API_KEY }}
